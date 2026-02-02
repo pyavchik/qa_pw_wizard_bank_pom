@@ -9,6 +9,8 @@ let lastName;
 let postalCode;
 
 test.beforeEach(async ({ page }) => {
+  page.once('dialog', (dialog) => dialog.accept());
+
   firstName = faker.person.firstName();
   lastName = faker.person.lastName();
   postalCode = faker.location.zipCode();
@@ -24,8 +26,8 @@ test('Assert manager can delete customer', async ({ page }) => {
 
   await managerMainPage.open();
   await managerMainPage.clickCustomersButton();
-  await customersListPage.clickDeleteForCustomerRow(firstName);
-  await customersListPage.assertCustomerRowIsNotPresent(firstName);
+  await customersListPage.clickDeleteForCustomer(firstName, lastName, postalCode);
+  await customersListPage.assertCustomerRowNotPresent(firstName, lastName, postalCode);
   await page.reload();
-  await customersListPage.assertCustomerRowIsNotPresent(firstName);
+  await customersListPage.assertCustomerRowNotPresent(firstName, lastName, postalCode);
 });

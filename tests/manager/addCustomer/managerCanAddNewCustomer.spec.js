@@ -13,13 +13,12 @@ test('Assert manager can add new customer', async ({ page }) => {
   const lastName = faker.person.lastName();
   const postalCode = faker.location.zipCode();
 
+  page.once('dialog', (dialog) => dialog.accept());
+
   await addCustomerPage.open();
   await addCustomerPage.addCustomer(firstName, lastName, postalCode);
-  await page.reload();
   await managerMainPage.open();
   await managerMainPage.clickCustomersButton();
-  await customersListPage.assertLastRowContainsFirstName(firstName);
-  await customersListPage.assertLastRowContainsLastName(lastName);
-  await customersListPage.assertLastRowContainsPostalCode(postalCode);
-  await customersListPage.assertLastRowAccountNumberIsEmpty();
+  await customersListPage.assertCustomerRowContainsData(firstName, lastName, postalCode);
+  await customersListPage.assertCustomerRowAccountNumberEmpty(firstName, lastName, postalCode);
 });

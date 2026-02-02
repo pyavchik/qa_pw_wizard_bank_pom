@@ -9,6 +9,8 @@ let lastName;
 let postalCode;
 
 test.beforeEach(async ({ page }) => {
+  page.once('dialog', (dialog) => dialog.accept());
+
   firstName = faker.person.firstName();
   lastName = faker.person.lastName();
   postalCode = faker.location.zipCode();
