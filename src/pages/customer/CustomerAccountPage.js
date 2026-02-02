@@ -34,6 +34,10 @@ export class CustomerAccountPage {
     await this.page.goto('/angularJs-protractor/BankingProject/#/account');
   }
 
+  async selectAccount(accountId) {
+    await this.accountIdDropDown.selectOption(accountId);
+  }
+
   async assertAccountIdInDropDownHasValue(value) {
     const accountNumberInDrodown = this.accountIdDropDown;
     await expect(accountNumberInDrodown).toHaveValue(value);
