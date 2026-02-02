@@ -15,15 +15,17 @@ test('Assert customer balance updates correctly after multiple operations', asyn
   await accountPage.clickDepositButton();
   await accountPage.fillAmountInputField('1000');
   await accountPage.clickDepositFormButton();
+  await accountPage.assertDepositSuccessfulMessageIsVisible();
 
   await accountPage.fillAmountInputField('500');
   await accountPage.clickDepositFormButton();
-  
+  await accountPage.assertDepositSuccessfulMessageIsVisible();
+
   await accountPage.assertAccountLineContainsText('Balance : 1500');
 
   await accountPage.clickWithdrawlButton();
   await accountPage.fillAmountInputField('700');
   await accountPage.clickWithdrawlFormButton();
-  
-  await accountPage.assertAccountLineContainsText('Balance : 800');
+  // Note: The app may not show a withdraw success message; balance assertion below validates completion.
+  await accountPage.assertAccountLineContainsText('Balance : 800', { timeout: 10000 });
 });

@@ -3,17 +3,16 @@ import { BankHomePage } from '../../../src/pages/BankHomePage';
 import { CustomerLoginPage } from '../../../src/pages/customer/CustomerLoginPage';
 import { CustomerAccountPage } from '../../../src/pages/customer/CustomerAccountPage';
 
-test('Assert correct customer Logout', async ({ page }) => {
-  /* 
-  Test:
+test('Customer Logout: user returns to customer select with empty dropdown', async ({ page }) => {
+  /*
+  Required test for customer Logout functionality:
   1. Open Wizard bank link
   2. Click [Customer Login]
   3. Select Neville Longbottom
   4. Click [Login]
   5. Click [Logout]
-  6. Wait for the page URL 
-  https://www.globalsqa.com/angularJs-protractor/BankingProject/#/customer
-  7. Assert the drop-down is present with empty value 
+  6. Wait for the page URL .../#/customer
+  7. Assert the dropdown is present with empty value
   */
   const bankHomePage = new BankHomePage(page);
   const customerLoginPage = new CustomerLoginPage(page);

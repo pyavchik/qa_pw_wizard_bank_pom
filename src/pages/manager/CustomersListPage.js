@@ -5,7 +5,7 @@ export class CustomersListPage {
     this.page = page;
     this.searchInput = page.getByPlaceholder('Search Customer');
     this.tableRows = page.getByRole('row').filter({ hasNotText: 'First Name' });
-    this.lastTableRow = page.getByRole('row').last();
+    this.lastTableRow = this.tableRows.last();
     this.lastRowFirstNameCell = this.lastTableRow.getByRole('cell').nth(0);
     this.lastRowLastNameCell = this.lastTableRow.getByRole('cell').nth(1);
     this.lastRowPostalCodeCell = this.lastTableRow.getByRole('cell').nth(2);
@@ -24,8 +24,40 @@ export class CustomersListPage {
     return rowLocator.getByRole('button', { name: 'Delete' });
   }
 
+  /**
+   * Returns the table row that contains the given customer's first name, last name, and postal code.
+   * Use this instead of .last() to find a customer by unique data and make tests less brittle.
+   */
+  getRowByCustomer(firstName, lastName, postalCode) {
+    return this.page
+      .getByRole('row')
+      .filter({ hasText: firstName })
+      .filter({ hasText: lastName })
+      .filter({ hasText: postalCode });
+  }
+
+  /**
+   * Finds the row by the First Name column cell that contains customerName, then clicks Delete.
+   * Using the name column (not hasText on the whole row) avoids matching text in other columns
+   * and reduces the chance of multiple rows matching (e.g. same name in different cells).
+   */
   async clickDeleteForCustomerRow(customerName) {
-    const row = this.page.getByRole('row').filter({ hasText: customerName });
+    const nameCell = this.page
+      .getByRole('row')
+      .getByRole('cell')
+      .nth(0)
+      .filter({ hasText: customerName })
+      .first();
+    const row = nameCell.locator('..');
+    await this.getDeleteButtonForRow(row).click();
+  }
+
+  /**
+   * Clicks Delete for the row matching the given customer (by unique first name, last name, postal code).
+   * Prefer this over clickDeleteForCustomerRow(name) when you have full customer data.
+   */
+  async clickDeleteForCustomer(firstName, lastName, postalCode) {
+    const row = this.getRowByCustomer(firstName, lastName, postalCode);
     await this.getDeleteButtonForRow(row).click();
   }
 
@@ -60,6 +92,41 @@ export class CustomersListPage {
 
   async assertCustomerRowIsNotPresent(customerName) {
     const row = this.page.getByRole('row').filter({ hasText: customerName });
+    await expect(row).toBeHidden();
+  }
+
+  /**
+   * Asserts that a row for the given customer exists and contains first name, last name, and postal code.
+   */
+  async assertCustomerRowContainsData(firstName, lastName, postalCode) {
+    const row = this.getRowByCustomer(firstName, lastName, postalCode);
+    await expect(row).toBeVisible();
+    await expect(row.getByRole('cell').nth(0)).toContainText(firstName);
+    await expect(row.getByRole('cell').nth(1)).toContainText(lastName);
+    await expect(row.getByRole('cell').nth(2)).toContainText(postalCode);
+  }
+
+  /**
+   * Asserts that the customer row has an empty account number cell.
+   */
+  async assertCustomerRowAccountNumberEmpty(firstName, lastName, postalCode) {
+    const row = this.getRowByCustomer(firstName, lastName, postalCode);
+    await expect(row.getByRole('cell').nth(3)).toHaveText('');
+  }
+
+  /**
+   * Asserts that the customer row has a non-empty account number cell.
+   */
+  async assertCustomerRowAccountNumberNotEmpty(firstName, lastName, postalCode) {
+    const row = this.getRowByCustomer(firstName, lastName, postalCode);
+    await expect(row.getByRole('cell').nth(3)).not.toHaveText('');
+  }
+
+  /**
+   * Asserts that no row exists for the given customer (by unique first name, last name, postal code).
+   */
+  async assertCustomerRowNotPresent(firstName, lastName, postalCode) {
+    const row = this.getRowByCustomer(firstName, lastName, postalCode);
     await expect(row).toBeHidden();
   }
 

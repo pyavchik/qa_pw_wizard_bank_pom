@@ -10,6 +10,8 @@ let lastName;
 let postalCode;
 
 test.beforeEach(async ({ page }) => {
+  page.once('dialog', (dialog) => dialog.accept());
+
   firstName = faker.person.firstName();
   lastName = faker.person.lastName();
   postalCode = faker.location.zipCode();
@@ -17,10 +19,9 @@ test.beforeEach(async ({ page }) => {
   const addCustomerPage = new AddCustomerPage(page);
   await addCustomerPage.open();
   await addCustomerPage.addCustomer(firstName, lastName, postalCode);
-  await page.reload();
 });
 
-test('Assert manager can add new customer', async ({ page }) => {
+test('Assert manager can open a new account for a customer', async ({ page }) => {
   const customerFullName = `${firstName} ${lastName}`;
   const managerMainPage = new BankManagerMainPage(page);
   const openAccountPage = new OpenAccountPage(page);
@@ -30,8 +31,10 @@ test('Assert manager can add new customer', async ({ page }) => {
   await managerMainPage.clickOpenAccountButton();
   await openAccountPage.selectCustomer(customerFullName);
   await openAccountPage.selectCurrency('Dollar');
+
+  page.once('dialog', (dialog) => dialog.accept());
   await openAccountPage.clickProcessButton();
-  await page.reload();
+
   await managerMainPage.clickCustomersButton();
-  await customersListPage.assertLastRowAccountNumberIsNotEmpty();
+  await customersListPage.assertCustomerRowAccountNumberNotEmpty(firstName, lastName, postalCode);
 });
