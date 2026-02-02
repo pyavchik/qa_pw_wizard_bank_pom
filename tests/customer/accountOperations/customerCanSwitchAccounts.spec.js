@@ -11,15 +11,15 @@ test('Assert customer can switch between accounts', async ({ page }) => {
   await customerLoginPage.clickLoginButton();
 
   const accounts = [
-    { id: '1004', currency: 'Dollar' },
-    { id: '1005', currency: 'Pound' },
-    { id: '1006', currency: 'Rupee' }
+    { id: 'number:1004', currency: 'Dollar' },
+    { id: 'number:1005', currency: 'Pound' },
+    { id: 'number:1006', currency: 'Rupee' }
   ];
 
   for (const account of accounts) {
     await accountPage.selectAccount(account.id);
     await accountPage.assertAccountIdInDropDownHasValue(account.id);
-    await accountPage.assertAccountLineContainsText(`Account Number : ${account.id}`);
+    await accountPage.assertAccountLineContainsText(`Account Number : ${account.id.replace('number:', '')}`);
     await accountPage.assertAccountLineContainsText(`Currency : ${account.currency}`);
   }
 });
